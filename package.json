@@ -1,0 +1,80 @@
+{
+  "name": "dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Dashboard App",
+  "author": "Revvknew Media",
+  "type": "module",
+  "homepage": "https://github.com/rupesh007-dev/dashboard-frontend",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rupesh007-dev/dashboard-frontend.git"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.17",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.17"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^39.2.6",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
+    "vite": "^7.2.4"
+  },
+  "main": "dist-electron/main.js",
+  "build": {
+    "appId": "com.revvknew.dashboard",
+    "productName": "Dashboard",
+    "copyright": "Copyright © 2024",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "dist-electron/preload.js"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "rupesh007-dev",
+      "repo": "dashboard-frontend"
+    }
+  }
+}
