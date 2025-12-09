@@ -8,13 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const isDev = process.env.NODE_ENV === 'development';
+// Adjust paths based on build structure
 const APP_ROOT = join(__dirname, '..');
-const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const RENDERER_DIST = join(APP_ROOT, 'dist');
 
-const preloadPath = isDev
-  ? join(__dirname, 'preload.js')
-  : join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron', 'preload.js');
+const preloadPath = join(__dirname, 'preload.js');
 
 let mainWindow;
 
@@ -22,21 +20,19 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    icon: join(APP_ROOT, 'public', 'icon.png'),
+    // icon: join(APP_ROOT, 'public', 'icon.png'), // Ensure icon exists
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: preloadPath,
-      webSecurity: !isDev,
     },
     show: false,
   });
 
-  // Remove menu
   mainWindow.setMenu(null);
 
-  if (isDev && VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(VITE_DEV_SERVER_URL);
+  if (isDev && process.env.VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(join(RENDERER_DIST, 'index.html'));
@@ -44,29 +40,37 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+    
+    // CHECK FOR UPDATES IMMEDIATELY ON LAUNCH (Production Only)
+    if (!isDev) {
+      autoUpdater.checkForUpdates();
+    }
   });
 }
 
-autoUpdater.autoDownload = false;
+// --- AUTO UPDATER CONFIG ---
+autoUpdater.autoDownload = true; // Automatically download
 autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on('checking-for-update', () => {
+  console.log('Checking for update...');
+});
 
 autoUpdater.on('update-available', () => {
   mainWindow?.webContents.send('update-available');
 });
 
 autoUpdater.on('update-not-available', () => {
-  mainWindow?.webContents.send('update-not-available');
+  console.log('No update available.');
 });
 
 autoUpdater.on('update-downloaded', () => {
+  // Notify UI that update is ready to be installed
   mainWindow?.webContents.send('update-downloaded');
 });
 
 autoUpdater.on('error', (error) => {
+  console.error('Update error:', error);
   mainWindow?.webContents.send('update-error', error.message);
 });
 
@@ -74,46 +78,16 @@ autoUpdater.on('download-progress', (progressObj) => {
   mainWindow?.webContents.send('download-progress', progressObj);
 });
 
-ipcMain.handle('check-for-updates', async () => {
-  if (isDev) {
-    return { status: 'dev' };
-  }
-  try {
-    await autoUpdater.checkForUpdates();
-    return { status: 'checked' };
-  } catch (error) {
-    return { status: 'error', error: error.message };
-  }
-});
-
-ipcMain.handle('download-update', async () => {
-  try {
-    await autoUpdater.downloadUpdate();
-    return { status: 'downloading' };
-  } catch (error) {
-    return { status: 'error', error: error.message };
-  }
-});
-
+// IPC Handlers
 ipcMain.handle('quit-and-install', () => {
-  autoUpdater.quitAndInstall();
+  autoUpdater.quitAndInstall(false, true); // Force run after install
 });
 
 ipcMain.handle('get-version', () => {
   return app.getVersion();
 });
 
-app.whenReady().then(() => {
-  createWindow();
-
-  if (!isDev) {
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

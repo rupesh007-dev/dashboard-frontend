@@ -1,7 +1,7 @@
 {
   "name": "dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Dashboard App",
   "author": "Revvknew Media",
   "type": "module",
@@ -10,13 +10,14 @@
     "type": "git",
     "url": "https://github.com/rupesh007-dev/dashboard-frontend.git"
   },
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run build:main",
+    "build:main": "esbuild electron/main.js --bundle --platform=node --format=esm --outfile=dist-electron/main.js --external:electron --external:electron-updater && esbuild electron/preload.js --bundle --platform=node --format=cjs --outfile=dist-electron/preload.js --external:electron",
     "lint": "eslint .",
     "preview": "vite preview",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "dist": "npm run build && electron-builder"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
@@ -30,20 +31,19 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^39.2.6",
-    "electron-builder": "^26.0.12",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "esbuild": "^0.20.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
     "prettier": "^3.7.4",
-    "vite": "^7.2.4"
+    "vite": "^5.1.4"
   },
-  "main": "dist-electron/main.js",
   "build": {
     "appId": "com.revvknew.dashboard",
     "productName": "Dashboard",
-    "copyright": "Copyright © 2024",
     "directories": {
       "output": "release"
     },
@@ -57,14 +57,7 @@
       "dist-electron/preload.js"
     ],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
+      "target": "nsis",
       "icon": "public/icon.png"
     },
     "nsis": {
