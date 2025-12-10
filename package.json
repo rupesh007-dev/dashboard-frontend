@@ -1,27 +1,16 @@
 {
-  "name": "dashboard",
+  "name": "dashboard-frontend",
   "private": true,
-  "version": "0.0.1",
-  "description": "Dashboard App",
-  "author": "Revvknew Media",
+  "version": "0.0.0",
   "type": "module",
-  "homepage": "https://github.com/rupesh007-dev/dashboard-frontend",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rupesh007-dev/dashboard-frontend.git"
-  },
-  "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && npm run build:main",
-    "build:main": "esbuild electron/main.js --bundle --platform=node --format=esm --outfile=dist-electron/main.js --external:electron --external:electron-updater && esbuild electron/preload.js --bundle --platform=node --format=cjs --outfile=dist-electron/preload.js --external:electron",
+    "dev": "vite --port 8000",
+    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "dist": "npm run build && electron-builder"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "electron-updater": "^6.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.17"
@@ -31,44 +20,10 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "electron": "^29.1.0",
-    "electron-builder": "^24.13.3",
-    "esbuild": "^0.20.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-    "prettier": "^3.7.4",
-    "vite": "^5.1.4"
-  },
-  "build": {
-    "appId": "com.revvknew.dashboard",
-    "productName": "Dashboard",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "dist-electron/**/*",
-      "package.json"
-    ],
-    "asar": true,
-    "asarUnpack": [
-      "dist-electron/preload.js"
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "public/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": false
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "rupesh007-dev",
-      "repo": "dashboard-frontend"
-    }
+    "vite": "^7.2.4"
   }
 }
